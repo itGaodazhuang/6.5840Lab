@@ -42,12 +42,6 @@ type TaskManager struct {
 	OutputFile []string
 }
 
-// structure for task list
-type TaskLists struct {
-	Index uint8
-	File  []string
-}
-
 // structure for coordinator
 type Coordinator struct {
 	// Your definitions here.
@@ -56,7 +50,7 @@ type Coordinator struct {
 	CompletedTaskCount int
 	Files              []string
 	Tim                []time.Timer
-	TaskList           []TaskLists
+	TaskList           []uint8
 	MapManager         []TaskManager
 	ReduceManager      []TaskManager
 	Mu                 sync.Mutex

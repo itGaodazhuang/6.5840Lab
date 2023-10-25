@@ -55,13 +55,13 @@ func (c *Coordinator) RequestTask(args *RequestTaskArgs, reply *RequestTaskReply
 	//dispatch task
 	if c.State == MAPPHASE {
 		reply.TaskType = MAP
-		curTask = &c.MapManager[c.TaskList[0].Index]
+		curTask = &c.MapManager[c.TaskList[0]]
 	} else if c.State == REDUCEPHASE {
 		reply.TaskType = REDUCE
-		curTask = &c.ReduceManager[c.TaskList[0].Index]
+		curTask = &c.ReduceManager[c.TaskList[0]]
 	}
-	reply.TaskIndex = c.TaskList[0].Index
-	reply.File = c.TaskList[0].File
+	reply.TaskIndex = c.TaskList[0]
+	reply.File = curTask.InputFile
 	reply.NReduce = c.NReduce
 
 	// change the task State
@@ -88,7 +88,7 @@ func (c *Coordinator) ExceedTime(taskManager *TaskManager) error {
 		// change the task State to UNDISPATCHED
 		c.Mu.Lock()
 		taskManager.State = UNDISPATCHED
-		c.TaskList = append(c.TaskList, TaskLists{taskManager.Index, taskManager.InputFile})
+		c.TaskList = append(c.TaskList, taskManager.Index)
 
 		if DEBUG {
 			fmt.Println("===========================================")
@@ -153,7 +153,7 @@ func (c *Coordinator) initReduceTask() {
 		for _, v := range c.MapManager {
 			files = append(files, v.OutputFile[i])
 		}
-		c.TaskList = append(c.TaskList, TaskLists{uint8(i), files})
+		c.TaskList = append(c.TaskList, uint8(i))
 		c.ReduceManager = append(c.ReduceManager, TaskManager{uint8(i), UNDISPATCHED, files, []string{}})
 	}
 	c.CompletedTaskCount = c.NReduce
@@ -201,7 +201,7 @@ func MakeCoordinator(files []string, NReduce int) *Coordinator {
 	c.Files = files
 	c.State = MAPPHASE
 	for i, v := range files {
-		c.TaskList = append(c.TaskList, TaskLists{uint8(i), []string{v}})
+		c.TaskList = append(c.TaskList, uint8(i))
 		c.MapManager = append(c.MapManager, TaskManager{uint8(i), UNDISPATCHED, []string{v}, []string{}})
 	}
 	c.CompletedTaskCount = len(c.MapManager)
