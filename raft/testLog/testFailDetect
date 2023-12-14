@@ -1,0 +1,7 @@
+#!/bin/bash
+
+for file in test*.log; do
+    if grep -q "FAIL	" "$file"; then
+        echo "$file contains failed tests"
+    fi
+done

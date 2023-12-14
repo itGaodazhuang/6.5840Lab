@@ -8,20 +8,24 @@ package raft
 // test with the original before submitting.
 //
 
-import "6.5840/labgob"
-import "6.5840/labrpc"
-import "bytes"
-import "log"
-import "sync"
-import "sync/atomic"
-import "testing"
-import "runtime"
-import "math/rand"
-import crand "crypto/rand"
-import "math/big"
-import "encoding/base64"
-import "time"
-import "fmt"
+import (
+	"bytes"
+	"log"
+	"math/rand"
+	"runtime"
+	"sync"
+	"sync/atomic"
+	"testing"
+
+	"6.5840/labgob"
+	"6.5840/labrpc"
+
+	crand "crypto/rand"
+	"encoding/base64"
+	"fmt"
+	"math/big"
+	"time"
+)
 
 func randstring(n int) string {
 	b := make([]byte, 2*n)
@@ -182,7 +186,7 @@ func (cfg *config) applier(i int, applyCh chan ApplyMsg) {
 // returns "" or error string
 func (cfg *config) ingestSnap(i int, snapshot []byte, index int) string {
 	if snapshot == nil {
-		log.Fatalf("nil snapshot")
+		log.Fatalf("%v nil snapshot", i)
 		return "nil snapshot"
 	}
 	r := bytes.NewBuffer(snapshot)
@@ -302,6 +306,7 @@ func (cfg *config) start1(i int, applier func(int, chan ApplyMsg)) {
 		if snapshot != nil && len(snapshot) > 0 {
 			// mimic KV server and process snapshot now.
 			// ideally Raft should send it up on applyCh...
+			log.Println("[", i, "] snapshot: ", snapshot)
 			err := cfg.ingestSnap(i, snapshot, -1)
 			if err != "" {
 				cfg.t.Fatal(err)
